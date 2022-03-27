@@ -1,5 +1,5 @@
 
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 
 with open('README.md') as f:
     readme = f.read()
@@ -9,5 +9,5 @@ setup(
     version='0.0.0',
     description='Mazes for Programmers - Python',
     author='Rob Weddell',
-    packages=find_packages()
+    packages=find_namespace_packages(where='src')
 )
