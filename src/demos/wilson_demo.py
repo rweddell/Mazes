@@ -1,5 +1,5 @@
 
-from Algorithms.wilson import Wilsons
+from algorithms.wilson import Wilsons
 from foundations.grid import Grid
 
 wilson = Wilsons()
