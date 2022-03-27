@@ -1,6 +1,6 @@
 
-from Foundations.PolarGrid import PolarGrid
-from Foundations.ColoredGrid import ColoredGrid
+from maze_structures.polar_grid import PolarGrid
+from maze_structures.color_grid import ColoredGrid
 
 
 class ColoredPolar(PolarGrid, ColoredGrid):

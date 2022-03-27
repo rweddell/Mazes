@@ -3,7 +3,7 @@
 Creates a simple solution to a maze using 
 Dijkstra's algorithm.
 
-Becomes really ugle with grids larger than 5x5
+Becomes really ugly with grids larger than 5x5
 because of ASCII representation depending on length
 of path/solution
 """

@@ -1,6 +1,6 @@
 
-from Foundations.ColoredGrid import ColoredGrid
-from Foundations.MaskedGrid import MaskedGrid
+from maze_structures.color_grid import ColoredGrid
+from maze_structures.masked_grid import MaskedGrid
 
 class ColoredMask(MaskedGrid, ColoredGrid):
 

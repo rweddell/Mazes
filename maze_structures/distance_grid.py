@@ -1,6 +1,6 @@
 
-import Foundations.Base36 as Base36
-from Foundations.Grid import Grid
+import maze_structures.base36 as Base36
+from maze_structures.grid import Grid
 
 
 class DistanceGrid(Grid):

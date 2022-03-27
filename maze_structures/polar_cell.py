@@ -1,5 +1,5 @@
 
-from maze_structures.cell import *
+from maze_structures.cell import Cell
 
 class PolarCell(Cell):
 

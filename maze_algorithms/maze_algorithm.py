@@ -1,5 +1,4 @@
 from abc import abstractclassmethod
-from maze_algorithms.maze_algorithm import MazeAlgorithm
 
 
 class MazeAlgorithm:
