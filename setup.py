@@ -9,5 +9,6 @@ setup(
     version='0.0.0',
     description='Mazes for Programmers - Python',
     author='Rob Weddell',
-    packages=find_namespace_packages(where='src')
+    # packages=find_namespace_packages(where='src')
+    packages=['foundations', 'algorithms']
 )
