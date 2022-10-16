@@ -10,4 +10,4 @@ python setup.py build
 ```python
 python setup.py install
 ```
-3. Run a demo in one of the demo folders
+3. Run a demo in the demo folders

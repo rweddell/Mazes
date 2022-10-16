@@ -34,15 +34,15 @@ class Distances:
         self.max_dist = max_dist
         return max_cell, max_dist
 
-# TODO: make this a static method
-def path_to(self, goal):
-    current = goal
-    path = Distances(self.root)
-    path[current] = self.cells[current]
-    while current != self.root:
-        for neighbor in current.links:
-            if self.cells[neighbor] < self.cells[current]:
-                path[neighbor] = self.cells[neighbor]
-                current = neighbor
-                break
-    return path
+    @staticmethod
+    def path_to(self, goal):
+        current = goal
+        path = Distances(self.root)
+        path[current] = self.cells[current]
+        while current != self.root:
+            for neighbor in current.links:
+                if self.cells[neighbor] < self.cells[current]:
+                    path[neighbor] = self.cells[neighbor]
+                    current = neighbor
+                    break
+        return path

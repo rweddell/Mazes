@@ -2,6 +2,7 @@
 from maze_structures.mask import *
 from maze_structures.masked_grid import MaskedGrid
 from maze_algorithms.recursive_backtrack import RecursiveBacktracker
+from datetime import date
 
 recback = RecursiveBacktracker()
 
@@ -20,4 +21,4 @@ img.save('Output\pngmask.png')
 smallmask = from_png_scaled('output\mazeimg.png')
 smallgrid = recback.on(MaskedGrid(smallmask))
 smallimage = smallgrid.to_png(size=10)
-smallimage.save('output\shrunken_maschii.png')
+smallimage.save(f'output\shrunken_maschii_{date.today()}.png')

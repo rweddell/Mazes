@@ -3,7 +3,7 @@ from random import randint, shuffle, choice
 from PIL import Image, ImageDraw
 
 
-class Grid(object):
+class Grid:
 
     def __init__(self, rows, columns):
         self.rows = rows

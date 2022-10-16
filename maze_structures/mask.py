@@ -28,7 +28,7 @@ class Mask:
         return total
 
     def __repr__(self) -> tuple(int,int):
-        return self.rows, self.columns
+        return (self.rows, self.columns)
 
     def random_location(self) -> tuple(int,int):
         row = randint(0, self.rows)
@@ -36,7 +36,7 @@ class Mask:
         while not self.is_bit(row, col):
             row = randint(0, self.rows)
             col = randint(0, self.columns)
-        return row, col
+        return (row, col)
 
     def __str__(self) -> str:
         stringy = ''
@@ -64,7 +64,7 @@ def from_txt(file:str) -> Mask:
     mask = Mask(rows, columns)
     for i in range(rows-1):
         for j in range(columns-1):
-            if lines[i][j] is 'x':
+            if lines[i][j] == 'x':
                 mask.set_bit(i, j, False)
     return mask
 

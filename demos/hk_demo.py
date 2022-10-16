@@ -1,6 +1,6 @@
 
-from maze_algorithms.hunt_and_kill import HuntAndKill as hk
 from maze_structures.grid import Grid
+from maze_algorithms.hunt_and_kill import HuntAndKill as hk
 
 jeremy = hk()
 
