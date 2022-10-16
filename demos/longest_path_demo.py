@@ -1,4 +1,3 @@
-
 from maze_structures.distance_grid import DistanceGrid
 
 

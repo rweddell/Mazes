@@ -1,4 +1,3 @@
-
 from maze_structures.color_grid import ColoredGrid
 from maze_structures.masked_grid import MaskedGrid
 

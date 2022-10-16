@@ -1,5 +1,4 @@
-
-import maze_structures.base36 as Base36
+import base36 as Base36
 from maze_structures.grid import Grid
 
 

@@ -5,21 +5,21 @@ from random import randint
 
 class Mask:
 
-    def __init__(self, rows, columns):
+    def __init__(self, rows:int, columns:int) -> None:
         self.rows = rows-1
         self.columns = columns-1
         self.bits = [[True for i in range(self.columns)] for j in range(self.rows)]
 
-    def is_bit(self, row, column):
+    def is_bit(self, row:int, column:int) -> bool:
         if row in range(0, self.rows) and column in range(0, self.columns):
             return self.bits[row][column]
         else:
             return False
 
-    def set_bit(self, row, column, value=True):
+    def set_bit(self, row:int, column:int, value:bool=True) -> None:
         self.bits[row][column] = value
 
-    def count(self):
+    def count(self) -> int:
         total = 0
         for row in self.rows:
             for col in row:
@@ -27,10 +27,10 @@ class Mask:
                     total += 1
         return total
 
-    def __repr__(self):
+    def __repr__(self) -> tuple(int,int):
         return self.rows, self.columns
 
-    def random_location(self):
+    def random_location(self) -> tuple(int,int):
         row = randint(0, self.rows)
         col = randint(0, self.columns)
         while not self.is_bit(row, col):
@@ -38,7 +38,7 @@ class Mask:
             col = randint(0, self.columns)
         return row, col
 
-    def __str__(self):
+    def __str__(self) -> str:
         stringy = ''
         for row in self.bits:
             for bit in row:
@@ -50,7 +50,7 @@ class Mask:
         return stringy
 
 
-def from_txt(file):
+def from_txt(file:str) -> Mask:
     """
     :param file(location of file):
     :return: Mask object
@@ -69,7 +69,7 @@ def from_txt(file):
     return mask
 
 
-def from_png(file):
+def from_png(file:str) -> Mask:
     """
     Mask object based on non-black pixel values of the png
     :param file:
@@ -86,7 +86,7 @@ def from_png(file):
     return mask
 
 
-def from_png_scaled(file):
+def from_png_scaled(file:str) -> Mask:
     """
     Creates a 1/10 scaled version of the png file.
     Quicker/neater than from_png.
@@ -105,3 +105,4 @@ def from_png_scaled(file):
             if pix[jth, ith] == (0, 0, 0) and mask.is_bit(i, j) and ith < rows and jth < columns:
                 mask.set_bit(i, j, value=False)
     return mask
+

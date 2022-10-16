@@ -1,4 +1,3 @@
-
 from maze_structures.polar_grid import PolarGrid
 from maze_structures.mask import Mask
 from maze_structures.masked_grid import MaskedGrid

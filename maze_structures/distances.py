@@ -19,20 +19,7 @@ class Distances:
 
     def keys(self):
         return list(self.cells.keys())
-
-    # TODO: make this a static method
-    def path_to(self, goal):
-        current = goal
-        path = Distances(self.root)
-        path[current] = self.cells[current]
-        while current != self.root:
-            for neighbor in current.links:
-                if self.cells[neighbor] < self.cells[current]:
-                    path[neighbor] = self.cells[neighbor]
-                    current = neighbor
-                    break
-        return path
-    
+   
     def max_path(self):
         """
         Finds the farthest cell from self.root
@@ -46,3 +33,16 @@ class Distances:
                 max_dist = self.cells[cell]
         self.max_dist = max_dist
         return max_cell, max_dist
+
+# TODO: make this a static method
+def path_to(self, goal):
+    current = goal
+    path = Distances(self.root)
+    path[current] = self.cells[current]
+    while current != self.root:
+        for neighbor in current.links:
+            if self.cells[neighbor] < self.cells[current]:
+                path[neighbor] = self.cells[neighbor]
+                current = neighbor
+                break
+    return path

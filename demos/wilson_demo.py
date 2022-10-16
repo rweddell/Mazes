@@ -1,4 +1,3 @@
-
 from maze_algorithms.wilson import Wilsons
 from maze_structures.grid import Grid
 

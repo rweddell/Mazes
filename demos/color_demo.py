@@ -1,4 +1,3 @@
-
 from maze_structures.color_polar import ColoredPolar
 from maze_structures.color_grid import ColoredGrid
 from maze_algorithms.recursive_backtrack import *

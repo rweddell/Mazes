@@ -1,4 +1,3 @@
-
 from random import choice
 from maze_algorithms.maze_algorithm import MazeAlgorithm
 

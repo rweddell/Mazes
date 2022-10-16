@@ -1,5 +1,6 @@
 from random import choice
 from maze_algorithms.maze_algorithm import MazeAlgorithm
+# from maze_algorithms import MazeAlgorithm
 
 class AldousBroder(MazeAlgorithm):
     
@@ -9,7 +10,7 @@ class AldousBroder(MazeAlgorithm):
         
         while unvisited > 0:
             neighbor = choice(cell.neighbors())
-            if len(neighbor.links) is 0:
+            if len(neighbor.links) == 0:
                 cell.link(neighbor)
                 unvisited -= 1
             cell = neighbor

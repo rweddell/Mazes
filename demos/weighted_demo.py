@@ -1,4 +1,3 @@
-
 from maze_structures.weighted_grid import WeightedGrid
 from maze_algorithms.recursive_backtrack import RecursiveBacktracker as rb
 

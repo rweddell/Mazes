@@ -1,4 +1,3 @@
-
 from maze_structures.grid import Grid
 from maze_algorithms.aldous_broder import AldousBroder
 

@@ -1,10 +1,8 @@
 from abc import abstractclassmethod
+from random import choice
 
 
 class MazeAlgorithm:
-
-    def __init__(self) -> None:
-        pass
 
     @abstractclassmethod
     def on(self, grid):

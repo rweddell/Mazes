@@ -4,10 +4,14 @@ from maze_structures.cell import Cell
 class PolarCell(Cell):
 
     def __init__(self, row, column):
+        """
+        Peak attribute is the supposed to be a filler point between this cell and it's outer neighbors
+        """
         super().__init__(row, column)
         self.outward = []
         self.cw = None
         self.ccw = None
+        self.peak = None
         self.inward = None
 
     def get_cw(self):

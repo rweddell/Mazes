@@ -1,4 +1,3 @@
-
 from maze_structures.polar_grid import PolarGrid
 from maze_structures.color_grid import ColoredGrid
 

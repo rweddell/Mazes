@@ -1,4 +1,3 @@
-
 from maze_structures.cell import Cell
 from random import randint, shuffle, choice
 from PIL import Image, ImageDraw

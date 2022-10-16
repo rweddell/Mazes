@@ -1,4 +1,3 @@
-
 from maze_structures.grid import Grid
 
 class ColoredGrid(Grid):

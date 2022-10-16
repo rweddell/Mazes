@@ -2,7 +2,7 @@
 from maze_structures.grid import Grid
 from maze_structures.polar_cell import PolarCell
 from PIL import Image, ImageDraw
-from math import *
+from math import cos, sin, pi
 from random import randint
 
 
