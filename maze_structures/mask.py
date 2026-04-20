@@ -1,13 +1,14 @@
 
 from PIL import Image
 from random import randint
+from typing import List, Tuple  
 
 
 class Mask:
 
     def __init__(self, rows:int, columns:int) -> None:
-        self.rows = rows-1
-        self.columns = columns-1
+        self.rows = rows
+        self.columns = columns
         self.bits = [[True for i in range(self.columns)] for j in range(self.rows)]
 
     def is_bit(self, row:int, column:int) -> bool:
@@ -21,21 +22,21 @@ class Mask:
 
     def count(self) -> int:
         total = 0
-        for row in self.rows:
-            for col in row:
+        for row in range(self.rows):
+            for col in range(self.columns):
                 if self.is_bit(row, col):
                     total += 1
         return total
 
-    def __repr__(self) -> tuple(int,int):
-        return (self.rows, self.columns)
+    def __repr__(self) -> str:
+        return f"({self.rows}, {self.columns})"
 
-    def random_location(self) -> tuple(int,int):
-        row = randint(0, self.rows)
-        col = randint(0, self.columns)
+    def random_location(self) -> Tuple[int, int]:
+        row = randint(0, self.rows - 1)
+        col = randint(0, self.columns - 1)
         while not self.is_bit(row, col):
-            row = randint(0, self.rows)
-            col = randint(0, self.columns)
+            row = randint(0, self.rows - 1)
+            col = randint(0, self.columns - 1)
         return (row, col)
 
     def __str__(self) -> str:
@@ -57,13 +58,11 @@ def from_txt(file:str) -> Mask:
     """
     with open(file) as f:
         lines = f.readlines()
-    f.close()
-    text = open(file, 'r')
-    rows = sum(1 for line in text)
-    columns = len(lines[1])
+    rows = len(lines)
+    columns = max(len(line.rstrip('\n')) for line in lines)
     mask = Mask(rows, columns)
-    for i in range(rows-1):
-        for j in range(columns-1):
+    for i in range(rows):
+        for j in range(len(lines[i].rstrip('\n'))):
             if lines[i][j] == 'x':
                 mask.set_bit(i, j, False)
     return mask

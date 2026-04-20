@@ -1,8 +1,7 @@
 from setuptools import setup
 from shutil import rmtree
 
-# with open('README.md') as f:
-    # readme = f.read()
+
 try:
     print('removing build files')
     rmtree('build')

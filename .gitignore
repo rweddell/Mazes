@@ -131,3 +131,6 @@ dmypy.json
 #MISC
 /output
 *.code-workspace
+.claude
+TODO.txt
+/archive

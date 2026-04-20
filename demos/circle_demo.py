@@ -6,6 +6,6 @@ from datetime import date
 polly = PolarGrid(8)
 albert = RecursiveBacktracker()
 grid = albert.on(polly)
-img = grid.to_png(cellsize=30)
+img = grid.to_png(size=50)
 today = date.today()
-img.save(f'output\circle_maze_{today}.png')
+img.save(f'output/circle_maze_{today}.png')

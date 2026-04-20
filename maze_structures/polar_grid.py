@@ -4,6 +4,7 @@ from maze_structures.polar_cell import PolarCell
 from PIL import Image, ImageDraw
 from math import cos, sin, pi
 from random import randint
+from typing import cast
 
 
 class PolarGrid(Grid):
@@ -11,13 +12,7 @@ class PolarGrid(Grid):
     def __init__(self, rows):
         super().__init__(rows, 1)
 
-    def retrieve(self, row, column):
-        """
-        Connects the ends of rows in a PolarGrid to the beginnings
-        :param row:
-        :param column:
-        :return: beginning/end of row or None
-        """
+    def retrieve(self, row, column) -> PolarCell | None:
         if -2 < column < self.grid[row].__len__()+1:
             return self.grid[row][column % self.grid[row].__len__()]
         return None
@@ -37,21 +32,17 @@ class PolarGrid(Grid):
         return rowlist
 
     def configure_cells(self):
-        for cell in self.each_cell():
+        for base_cell in self.each_cell():
+            cell = cast(PolarCell, base_cell)
             row, col = cell.row, cell.column
             if row > 0:
                 cell.cw = self.retrieve(row, col+1)
                 cell.ccw = self.retrieve(row, col-1)
                 ratio = self.grid[row].__len__()/self.grid[row-1].__len__()
-                if row-1 != 0:
-                    parent = self.grid[row-1][int(col/ratio)]
-                else:
-                    parent = self.grid[row-1][0]
+                parent = cast(PolarCell, self.grid[row-1][int(col/ratio) if row-1 != 0 else 0])
                 parent.outward.append(cell)
                 cell.inward = parent
             elif row == 0:
-                cell.cw = self.retrieve(row, col+1)
-                cell.cw = self.retrieve(row+1, col+1)
                 for neighbor in self.grid[row+1]:
                     cell.outward.append(neighbor)
 
@@ -60,25 +51,25 @@ class PolarGrid(Grid):
         col = randint(0, self.grid[row].__len__()-1)
         return self.grid[row][col]
 
-    def to_png(self, cellsize=40):
+    def to_png(self, size=40):
         """
         Creates an Image object of the grid that can be saved to a png
-        :param cellsize: height of cell
+        :param size: cell height in pixels
         :return: Image object
         """
-        imgsize = 2 * self.rows * cellsize
+        imgsize = 2 * self.rows * size
         bg = (255, 255, 255)
         wall = (0, 0, 0)
         img = Image.new('RGBA', (imgsize+1, imgsize+1), bg)
         drw = ImageDraw.Draw(img)
         center = imgsize/2
-        # TODO: tweak the ellipse to make thicker lines. White fill/black png background?
         drw.ellipse([(0, 0), (imgsize+1, imgsize+1)], fill=wall, outline=wall)
         drw.ellipse([(2, 2), (imgsize-1, imgsize-1)], fill=bg, outline=wall)
-        for cell in self.each_cell():
+        for base_cell in self.each_cell():
+            cell = cast(PolarCell, base_cell)
             theta = (2 * pi)/self.grid[cell.row].__len__()
-            inner_radius = cell.row * cellsize
-            outer_radius = (cell.row + 1) * cellsize
+            inner_radius = cell.row * size
+            outer_radius = (cell.row + 1) * size
             theta_ccw = cell.column * theta
             theta_cw = (cell.column+1) * theta
 
@@ -90,22 +81,17 @@ class PolarGrid(Grid):
             cy = center + round(inner_radius * sin(theta_cw))
             dx = center + round(outer_radius * cos(theta_cw))
             dy = center + round(outer_radius * sin(theta_cw))
-            # Trying to get the "peak" at point between cw and ccw
-            # midx = center + round((outer_radius * cos(theta_ccw)+((bx - dx)/2))*1.2)
-            # midy = center + round((outer_radius * sin(theta_ccw)+((by - dy)/2))*1.2)
+
             color = self.bg_color(cell)
             if color:
                 if cell.row == 0:
-                    drw.ellipse([(center-cellsize, center-cellsize), (center+cellsize, center+cellsize)], fill=color)
+                    drw.ellipse([(center-size, center-size), (center+size, center+size)], fill=color)
                 else:
                     drw.polygon([(ax, ay), (bx, by), (dx, dy), (cx, cy)], fill=color)
-                    # TODO: Get rid of that last bit of white around the center of the circle
-                    #drw.chord([(cx, cy), (dx, dy)], 0, 90, fill=color)
             if not cell.is_linked(cell.inward):
-                # TODO: Understand the trig to get ImageDraw.arc to work.
-                # might not be possible with PIL.ImageDraw due to bounding boxes
-                #drw.arc([(bx, by), (dx, dy)], ax, cx, fill=wall)
-                drw.line([(ax, ay), (cx, cy)], fill=wall, width=4)
+                slope1 = ((by-ay)/(bx-ax))+90
+                slope2 = ((dy-cy)/(dx-cx))+90
+                drw.arc(xy=[(bx, by), (dx, dy)], start=slope1, end=slope2, fill=wall)
             if not cell.is_linked(cell.cw):
                 drw.line([(cx, cy), (dx, dy)], fill=wall, width=4)
         return img

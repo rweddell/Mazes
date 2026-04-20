@@ -13,8 +13,6 @@ class Grid(object):
         self.size = self.get_size()
 
     def __getitem__(self, index):
-        print(index)
-        print(self.rows, self.columns)
         return self.grid[index]
 
     def __eq__(self, other):
@@ -115,10 +113,9 @@ class Grid(object):
         """
         width = size * self.columns
         height = size * self.rows
-        dimensions = (height, width)
         bg = (255, 255, 255)
         wall = (0, 0, 0)
-        img = Image.new('RGBA', dimensions, bg)
+        img = Image.new('RGBA', (width, height), bg)
         drw = ImageDraw.Draw(img)
         for cell in self.each_cell():
             x1 = int(cell.column * size)
