@@ -20,9 +20,15 @@ Python implementation of maze generation algorithms and visualizations from the 
 
 ## Commands
 
-**Install:**
+**Build & install** (setup.py wipes `build/` and `dist/` on every run):
 ```bash
+python setup.py build
 python setup.py install
+```
+
+**Launch the GUI** (tkinter app — the main entry point):
+```bash
+python main.py
 ```
 
 **Run a demo:**
@@ -31,10 +37,9 @@ python demos/binary_tree_demo.py   # ASCII output
 python demos/color_demo.py         # PNG output to output/
 ```
 
-**Dependencies** (not in setup.py — install manually):
-```bash
-pip install Pillow
-```
+**Dependencies:** `pip install Pillow` (not in setup.py). `tkinter`/`urllib` are stdlib.
+`setup.py` only packages `maze_structures` + `maze_algorithms` (not `ui`), so run the GUI from
+the project root via `python main.py`.
 
 There is no test suite and no linter configured. Demos serve as the primary way to validate behavior.
 
@@ -65,9 +70,21 @@ Algorithms: `BinaryTree`, `Sidewinder`, `AldousBroder`, `Wilson`, `HuntAndKill`,
 - `ColoredGrid` — overrides PNG rendering to colorize cells by distance intensity
 - `MaskedGrid` — uses a `Mask` object to disable cells (supports image or text masks)
 - `PolarGrid` — circular coordinate grid; row widths grow outward
+- `ColoredPolar` — multiple-inherits `PolarGrid` + `ColoredGrid` for colorized circular mazes
+- `WeightedGrid` — pairs with `WeightedCell` for Dijkstra/weighted pathfinding
 
 **Distance tracking (`distances.py`, `distance_grid.py`):**  
 `Distances` runs BFS (or priority queue for weighted) from a root cell and stores distances. Used for path-finding (`path_to()`) and coloring (`ColoredGrid`).
+
+### `ui/` — Tkinter GUI (`ui/app.py`)
+
+`MazeApp(tk.Tk)` is a two-panel window: left = controls, right = preview canvas.
+It maps user choices to the packages above via two dicts (`ALGORITHMS`, `GRID_TYPES`):
+- `_build_grid()` decides the grid type — `PolarGrid` (ignores columns + image), else
+  `MaskedGrid` from `image_mask.from_image_edges`/`from_image_shape` when an image is supplied,
+  else `ColoredGrid`. Image sources come from a file browse or a URL.
+- `_generate()` runs the selected algorithm's `.on(grid)`, calls `grid.to_png(size=...)`, and
+  renders the result. Errors surface in a `messagebox` and the status label (graceful handling).
 
 ### Typical usage pattern (from demos):
 
@@ -87,8 +104,8 @@ grid.to_png("output/maze.png")
 - `PolarGrid` dynamically computes row widths based on circumference; algorithms must handle variable neighbor counts.
 - `wilson.py` defines the class as `Wilsons` (not `Wilson`) — import accordingly.
 
-## Session summary (2026-04-19)
+## Session summary (2026-04-19 → 2026-06-04)
 
-**Bug fixes:** removed debug prints from `Grid.__getitem__`; fixed swapped PIL dimensions in `Grid.to_png`; fixed `Mask.__init__` off-by-one (was subtracting 1 from rows/cols); fixed `Mask.random_location` IndexError; fixed `from_txt` double file open; fixed duplicate `cell.cw` assignment in `PolarGrid.configure_cells`; fixed `PolarGrid.to_png` parameter renamed from `cellsize` to `size`; fixed `wilson.py` broken import; added `cast(PolarCell, ...)` to resolve Pyright errors in `polar_grid.py`.
+**Bug fixes:** `Grid.__getitem__` debug prints removed; `Grid.to_png` swapped PIL dims; `Mask.__init__` off-by-one; `Mask.random_location` IndexError; `from_txt` double open; `PolarGrid` duplicate `cell.cw`; `PolarGrid.to_png` `cellsize`→`size`; `wilson.py` import; Pyright `cast(PolarCell, ...)` in `polar_grid.py`.
 
-**New features:** `maze_structures/image_mask.py` — edge-detection and shape-mask generation from PIL images or URLs; `ui/app.py` — tkinter GUI (algorithm picker, grid type, size inputs, image upload/URL, preview canvas, save dialog); `main.py` now launches the UI.
+**Features:** `image_mask.py` (edge/shape masks from PIL images or URLs); `ui/app.py` tkinter GUI (algorithm + grid-type pickers, size, image upload/URL, preview, save); `main.py` launches the GUI. Documented GUI + build/install/launch commands in this file.
