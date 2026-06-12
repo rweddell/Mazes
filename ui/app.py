@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 from mazes.structures.grid import Grid
 from mazes.structures.color_grid import ColoredGrid
 from mazes.structures.masked_grid import MaskedGrid
-from mazes.structures.polar_grid import PolarGrid
+from mazes.structures.color_polar import ColoredPolar
 from mazes.structures.mask import from_png as mask_from_png
 from mazes.structures.image_mask import (
     from_image_edges, from_image_shape,
@@ -31,8 +31,31 @@ ALGORITHMS = {
     "Hunt & Kill": HuntAndKill,
 }
 
+def _hex(rgb):
+    return "#%02x%02x%02x" % rgb
+
+
+# slate-gray UI theme
+BG = "#37474f"        # main background (blue-gray 800)
+PANEL = "#455a64"     # input fields / buttons (blue-gray 700)
+TEXT = "#eceff1"      # primary text
+MUTED = "#90a4ae"     # secondary / disabled text
+ACTIVE = "#546e7a"    # hover / active
+CANVAS_BG = "#2b353d"  # preview area
+
+
 IMAGE_MODES = ["Edge Detection", "Shape Mask"]
 GRID_TYPES = ["Standard", "Polar (Circular)"]
+
+# distance-gradient base colors (the hue of the farthest cells)
+COLORS = [
+    ("Green",  (0, 128, 0)),
+    ("Blue",   (30, 60, 200)),
+    ("Red",    (200, 40, 40)),
+    ("Purple", (140, 40, 160)),
+    ("Orange", (220, 130, 20)),
+    ("Teal",   (0, 150, 150)),
+]
 
 
 class MazeApp(tk.Tk):
@@ -43,7 +66,41 @@ class MazeApp(tk.Tk):
         self._current_image: Image.Image | None = None
         self._source_image: Image.Image | None = None
         self._photo: ImageTk.PhotoImage | None = None
+        self._base_color = COLORS[0][1]
+        self._swatches: list[tk.Button] = []
+        self._apply_theme()
         self._build_ui()
+
+    def _apply_theme(self):
+        self.configure(bg=BG)
+        style = ttk.Style(self)
+        style.theme_use("clam")  # clam honors color options on Windows; vista doesn't
+        style.configure(".", background=BG, foreground=TEXT,
+                        fieldbackground=PANEL, bordercolor=ACTIVE,
+                        lightcolor=PANEL, darkcolor=PANEL)
+        style.configure("TFrame", background=BG)
+        style.configure("TLabel", background=BG, foreground=TEXT)
+        style.configure("TLabelframe", background=BG, bordercolor=ACTIVE)
+        style.configure("TLabelframe.Label", background=BG, foreground=MUTED)
+        style.configure("TButton", background=PANEL, foreground=TEXT,
+                        bordercolor=ACTIVE, focuscolor=BG)
+        style.map("TButton",
+                  background=[("active", ACTIVE), ("pressed", ACTIVE)])
+        style.configure("TCheckbutton", background=BG, foreground=TEXT)
+        style.map("TCheckbutton", background=[("active", BG)],
+                  indicatorcolor=[("selected", ACTIVE)])
+        style.configure("TCombobox", fieldbackground=PANEL, background=PANEL,
+                        foreground=TEXT, arrowcolor=TEXT)
+        style.map("TCombobox", fieldbackground=[("readonly", PANEL)],
+                  foreground=[("readonly", TEXT)])
+        style.configure("TSpinbox", fieldbackground=PANEL, background=PANEL,
+                        foreground=TEXT, arrowcolor=TEXT)
+        style.configure("TEntry", fieldbackground=PANEL, foreground=TEXT)
+        # the combobox dropdown is a tk Listbox, styled via the option database
+        self.option_add("*TCombobox*Listbox.background", PANEL)
+        self.option_add("*TCombobox*Listbox.foreground", TEXT)
+        self.option_add("*TCombobox*Listbox.selectBackground", ACTIVE)
+        self.option_add("*TCombobox*Listbox.selectForeground", TEXT)
 
     def _build_ui(self):
         # ── left panel (controls) ──────────────────────────────────────────
@@ -97,22 +154,38 @@ class MazeApp(tk.Tk):
                                                      sticky="ew", pady=(6, 0))
         self._img_path_var = tk.StringVar(value="")
         ttk.Label(img_frame, textvariable=self._img_path_var,
-                  wraplength=180, foreground="gray"
+                  wraplength=180, foreground=MUTED
                   ).grid(row=3, column=0, columnspan=2, sticky="w")
 
         ttk.Button(img_frame, text="Clear image",
                    command=self._clear_image).grid(row=4, column=0, columnspan=2,
                                                     sticky="ew", pady=(4, 0))
 
+        # color picker (distance-gradient base color)
+        color_frame = ttk.LabelFrame(ctrl, text="Color", padding=6)
+        color_frame.grid(row=6, column=0, sticky="ew", pady=(0, 8))
+        self._colorize_var = tk.BooleanVar(value=True)
+        ttk.Checkbutton(color_frame, text="Colorize", variable=self._colorize_var,
+                        command=self._on_colorize_toggle
+                        ).grid(row=0, column=0, columnspan=len(COLORS),
+                               sticky="w", pady=(0, 4))
+        for i, (name, rgb) in enumerate(COLORS):
+            btn = tk.Button(color_frame, width=2, bg=_hex(rgb),
+                            relief="raised", bd=2,
+                            command=lambda idx=i: self._on_color(idx))
+            btn.grid(row=1, column=i, padx=2)
+            self._swatches.append(btn)
+        self._on_color(0)  # select default
+
         # action buttons
         ttk.Button(ctrl, text="Generate", command=self._generate
-                   ).grid(row=6, column=0, sticky="ew", pady=(4, 2))
+                   ).grid(row=7, column=0, sticky="ew", pady=(4, 2))
         ttk.Button(ctrl, text="Save image…", command=self._save
-                   ).grid(row=7, column=0, sticky="ew", pady=(0, 4))
+                   ).grid(row=8, column=0, sticky="ew", pady=(0, 4))
 
         self._status_var = tk.StringVar(value="Ready.")
         ttk.Label(ctrl, textvariable=self._status_var, wraplength=200,
-                  foreground="steelblue").grid(row=8, column=0, sticky="w")
+                  foreground=MUTED).grid(row=9, column=0, sticky="w")
 
         # ── right panel (preview) ─────────────────────────────────────────
         preview = ttk.Frame(self, padding=10)
@@ -120,7 +193,8 @@ class MazeApp(tk.Tk):
         self.columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=1)
 
-        self._canvas = tk.Canvas(preview, bg="#f0f0f0", width=600, height=600)
+        self._canvas = tk.Canvas(preview, bg=CANVAS_BG, highlightthickness=0,
+                                 width=600, height=600)
         self._canvas.pack(fill="both", expand=True)
 
     # ── event handlers ────────────────────────────────────────────────────
@@ -128,7 +202,7 @@ class MazeApp(tk.Tk):
     def _on_grid_type_change(self, *_):
         polar = self._grid_var.get() == "Polar (Circular)"
         state = "disabled" if polar else "normal"
-        self._cols_label.configure(foreground="gray" if polar else "black")
+        self._cols_label.configure(foreground=MUTED if polar else TEXT)
         self._cols_spin.configure(state=state)
 
     def _browse_image(self):
@@ -147,6 +221,17 @@ class MazeApp(tk.Tk):
         self._url_var.set("")
         self._status_var.set("Image cleared.")
 
+    def _on_color(self, idx):
+        self._base_color = COLORS[idx][1]
+        for i, btn in enumerate(self._swatches):
+            btn.configure(relief="sunken" if i == idx else "raised")
+
+    def _on_colorize_toggle(self):
+        # grey out the swatches when coloring is off
+        state = "normal" if self._colorize_var.get() else "disabled"
+        for btn in self._swatches:
+            btn.configure(state=state)
+
     def _generate(self):
         try:
             self._status_var.set("Generating…")
@@ -154,9 +239,11 @@ class MazeApp(tk.Tk):
             grid = self._build_grid()
             algo = ALGORITHMS[self._algo_var.get()]()
             algo.on(grid)
-            # colored grids need a distance map before to_png()
-            if hasattr(grid, "set_distances"):
+            # colored grids need a distance map + base color before to_png();
+            # skip it for a plain black-on-white maze (bg_color then returns None)
+            if self._colorize_var.get() and isinstance(grid, ColoredGrid):
                 grid.set_distances(grid.random_cell().get_distances())
+                grid.set_base_color(self._base_color)
             cell_px = max(4, min(20, 600 // max(getattr(grid, 'rows', 20),
                                                   getattr(grid, 'columns', 20))))
             img = grid.to_png(size=cell_px)
@@ -175,7 +262,7 @@ class MazeApp(tk.Tk):
 
         # polar ignores image source and columns
         if grid_type == "Polar (Circular)":
-            return PolarGrid(rows)
+            return ColoredPolar(rows)
 
         # load image if provided
         img = self._load_source_image()
@@ -203,7 +290,7 @@ class MazeApp(tk.Tk):
         canvas_w = self._canvas.winfo_width() or 600
         canvas_h = self._canvas.winfo_height() or 600
         img_fit = img.copy()
-        img_fit.thumbnail((canvas_w, canvas_h), Image.LANCZOS)
+        img_fit.thumbnail((canvas_w, canvas_h), Image.Resampling.LANCZOS)
         self._photo = ImageTk.PhotoImage(img_fit)
         self._canvas.delete("all")
         self._canvas.create_image(canvas_w // 2, canvas_h // 2,

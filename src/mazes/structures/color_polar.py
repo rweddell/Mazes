@@ -3,20 +3,13 @@ from mazes.structures.color_grid import ColoredGrid
 
 
 class ColoredPolar(PolarGrid, ColoredGrid):
+    """Circular grid that colors cells by distance.
+
+    PolarGrid.to_png handles the circular rendering; set_distances, bg_color
+    and base_color come from ColoredGrid via the MRO.
+    """
 
     def __init__(self, rows):
+        # PolarGrid.__init__ -> super() resolves to ColoredGrid (sets distlist,
+        # base_color) -> Grid, so the colored fields are initialized too.
         PolarGrid.__init__(self, rows)
-        self.farthest = None
-        self.max_dist = None
-        self.distlist = None
-
-    def set_distances(self, distances):
-        self.distlist = distances
-        self.farthest, self.max_dist = distances.max_path()
-
-    def bg_color(self, cell):
-        distance = self.distlist[cell]
-        intensity = (self.max_dist - distance) / self.max_dist
-        dark = round(255 * intensity)
-        bright = 128 + round(127 * intensity)
-        return (bright, dark, bright)

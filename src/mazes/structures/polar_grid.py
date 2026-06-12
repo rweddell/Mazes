@@ -55,50 +55,79 @@ class PolarGrid(Grid):
         col = randint(0, self.grid[row].__len__()-1)
         return self.grid[row][col]
 
+    @staticmethod
+    def _sector_points(center, inner_radius, outer_radius, t0, t1):
+        """Points outlining an annular sector, following both arcs.
+
+        Filling with a straight 4-corner polygon leaves a white crescent
+        between the chord and the true arc (most visible at the outer edge);
+        tessellating the arcs makes the fill hug the circle so adjacent cells
+        meet with no gap.
+        """
+        segs = max(2, int((t1 - t0) / (pi / 36)))  # ~5 degrees per segment
+        pts = []
+        for i in range(segs + 1):                  # inner arc, ccw -> cw
+            t = t0 + (t1 - t0) * i / segs
+            pts.append((center + inner_radius * cos(t),
+                        center + inner_radius * sin(t)))
+        for i in range(segs + 1):                  # outer arc, cw -> ccw
+            t = t1 - (t1 - t0) * i / segs
+            pts.append((center + outer_radius * cos(t),
+                        center + outer_radius * sin(t)))
+        return pts
+
     def to_png(self, size=40):
         """
         Creates an Image object of the grid that can be saved to a png
         :param size: cell height in pixels
         :return: Image object
         """
-        imgsize = 2 * self.rows * size
+        # Render everything at ss x resolution, then shrink with LANCZOS so the
+        # arcs and radial lines come out anti-aliased instead of jagged.
+        ss = 3
+        csize = size * ss                 # supersampled cell height
+        margin = csize                    # keep the outer ring clear of the border
+        rmax = self.rows * csize          # radius of the outermost ring
+        imgsize = 2 * rmax + 2 * margin
+        center = imgsize / 2
+        wall_w = max(2, round(size * 0.1)) * ss
         bg = (255, 255, 255)
         wall = (0, 0, 0)
-        img = Image.new('RGBA', (imgsize+1, imgsize+1), bg)
+        img = Image.new('RGBA', (imgsize, imgsize), bg)
         drw = ImageDraw.Draw(img)
-        center = imgsize/2
-        drw.ellipse([(0, 0), (imgsize+1, imgsize+1)], fill=wall, outline=wall)
-        drw.ellipse([(2, 2), (imgsize-1, imgsize-1)], fill=bg, outline=wall)
         for base_cell in self.each_cell():
             cell = cast(PolarCell, base_cell)
             theta = (2 * pi)/self.grid[cell.row].__len__()
-            inner_radius = cell.row * size
-            outer_radius = (cell.row + 1) * size
+            inner_radius = cell.row * csize
+            outer_radius = (cell.row + 1) * csize
             theta_ccw = cell.column * theta
             theta_cw = (cell.column+1) * theta
 
-            ax = center + round(inner_radius * cos(theta_ccw))
-            ay = center + round(inner_radius * sin(theta_ccw))
-            bx = center + round(outer_radius * cos(theta_ccw))
-            by = center + round(outer_radius * sin(theta_ccw))
-            cx = center + round(inner_radius * cos(theta_cw))
-            cy = center + round(inner_radius * sin(theta_cw))
-            dx = center + round(outer_radius * cos(theta_cw))
-            dy = center + round(outer_radius * sin(theta_cw))
+            cx = center + inner_radius * cos(theta_cw)
+            cy = center + inner_radius * sin(theta_cw)
+            dx = center + outer_radius * cos(theta_cw)
+            dy = center + outer_radius * sin(theta_cw)
 
             color = self.bg_color(cell)
             if color:
                 if cell.row == 0:
-                    drw.ellipse([(center-size, center-size), (center+size, center+size)], fill=color)
+                    drw.ellipse([(center-csize, center-csize), (center+csize, center+csize)], fill=color)
                 else:
-                    drw.polygon([(ax, ay), (bx, by), (dx, dy), (cx, cy)], fill=color)
+                    drw.polygon(self._sector_points(center, inner_radius,
+                                                    outer_radius, theta_ccw,
+                                                    theta_cw), fill=color)
             if cell.row > 0 and not cell.is_linked(cell.inward):
                 # inner wall: arc at inner_radius spanning the cell's angular range
                 r = inner_radius
                 drw.arc([(center-r, center-r), (center+r, center+r)],
                         start=degrees(theta_ccw), end=degrees(theta_cw),
-                        fill=wall, width=4)
+                        fill=wall, width=wall_w)
             if cell.row > 0 and not cell.is_linked(cell.cw):
                 # clockwise wall: radial line from inner to outer corner
-                drw.line([(cx, cy), (dx, dy)], fill=wall, width=4)
-        return img
+                drw.line([(cx, cy), (dx, dy)], fill=wall, width=wall_w)
+        # outer boundary circle on top of the fills so it isn't painted over
+        # (a bit thicker than the interior walls)
+        drw.ellipse([(center - rmax, center - rmax), (center + rmax, center + rmax)],
+                    outline=wall, width=round(wall_w * 1.5))
+        final = round(imgsize / ss)
+        return img.resize((final, final), Image.Resampling.LANCZOS)

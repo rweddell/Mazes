@@ -17,7 +17,7 @@ def from_image_edges(img: Image.Image, max_dim: int = 80, threshold: int = 30) -
     scale = max_dim / max(img.width, img.height)
     new_w = max(1, int(img.width * scale))
     new_h = max(1, int(img.height * scale))
-    img = img.resize((new_w, new_h), Image.LANCZOS)
+    img = img.resize((new_w, new_h), Image.Resampling.LANCZOS)
     edges = img.filter(ImageFilter.FIND_EDGES)
     mask = Mask(new_h, new_w)
     pixels = edges.load()
@@ -40,7 +40,7 @@ def from_image_shape(img: Image.Image, max_dim: int = 80, bg_threshold: int = 20
     scale = max_dim / max(img.width, img.height)
     new_w = max(1, int(img.width * scale))
     new_h = max(1, int(img.height * scale))
-    img = img.resize((new_w, new_h), Image.LANCZOS)
+    img = img.resize((new_w, new_h), Image.Resampling.LANCZOS)
     mask = Mask(new_h, new_w)
     pixels = img.load()
     for row in range(new_h):

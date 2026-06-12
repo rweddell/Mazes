@@ -70,7 +70,7 @@ class Grid(object):
     def contents_of(self, cell):
         return " "
         
-    def bg_color(self, cell):
+    def bg_color(self, cell) -> tuple[int, int, int] | None:
         return None
 
     def __str__(self):
@@ -93,7 +93,7 @@ class Grid(object):
         return output
         
     def __repr__(self):
-        return self.rows, self.columns
+        return f"{type(self).__name__}({self.rows}, {self.columns})"
 
     def deadends(self):
         """
