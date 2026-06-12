@@ -1,9 +1,16 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "mazes"
 version = "0.1.0"
-description = "Add your description here"
+description = "Maze generation algorithms and visualizations from 'Mazes for Programmers'"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "pillow>=12.2.0",
 ]
+
+[tool.setuptools.packages.find]
+where = ["src"]

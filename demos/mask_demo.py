@@ -1,8 +1,8 @@
-from maze_structures.polar_grid import PolarGrid
-from maze_structures.mask import Mask
-from maze_structures.masked_grid import MaskedGrid
-from maze_algorithms.recursive_backtrack import RecursiveBacktracker as rb
-from maze_algorithms.aldous_broder import AldousBroder
+from mazes.structures.polar_grid import PolarGrid
+from mazes.structures.mask import Mask
+from mazes.structures.masked_grid import MaskedGrid
+from mazes.algorithms.recursive_backtrack import RecursiveBacktracker as rb
+from mazes.algorithms.aldous_broder import AldousBroder
 
 temp = Mask(10, 10)
 temp.set_bit(0, 0, value=False)

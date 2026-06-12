@@ -1,6 +1,6 @@
 
-from maze_structures.polar_grid import PolarGrid
-from maze_algorithms.recursive_backtrack import RecursiveBacktracker
+from mazes.structures.polar_grid import PolarGrid
+from mazes.algorithms.recursive_backtrack import RecursiveBacktracker
 from datetime import date
 
 polly = PolarGrid(8)

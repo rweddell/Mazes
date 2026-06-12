@@ -1,5 +1,5 @@
-from maze_structures.grid import Grid
-from maze_algorithms.aldous_broder import AldousBroder
+from mazes.structures.grid import Grid
+from mazes.algorithms.aldous_broder import AldousBroder
 from datetime import date
 
 aldous = AldousBroder()

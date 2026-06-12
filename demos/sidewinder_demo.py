@@ -1,6 +1,6 @@
 
-from maze_structures.grid import Grid
-from maze_algorithms.sidewinder import Sidewinder
+from mazes.structures.grid import Grid
+from mazes.algorithms.sidewinder import Sidewinder
 import random
 
 

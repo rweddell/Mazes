@@ -8,9 +8,9 @@ because of ASCII representation depending on length
 of path/solution
 """
 
-from maze_structures.distance_grid import DistanceGrid
-from maze_algorithms.aldous_broder import AldousBroder
-from maze_algorithms.recursive_backtrack import RecursiveBacktracker as rb
+from mazes.structures.distance_grid import DistanceGrid
+from mazes.algorithms.aldous_broder import AldousBroder
+from mazes.algorithms.recursive_backtrack import RecursiveBacktracker as rb
 
 larry = rb()
 

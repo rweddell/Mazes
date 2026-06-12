@@ -1,4 +1,4 @@
-from maze_structures.distance_grid import DistanceGrid
+from mazes.structures.distance_grid import DistanceGrid
 
 
 grid = DistanceGrid(5, 5)

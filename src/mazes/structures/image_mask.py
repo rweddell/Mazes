@@ -1,5 +1,5 @@
 from PIL import Image, ImageFilter, ImageOps
-from maze_structures.mask import Mask
+from mazes.structures.mask import Mask
 import urllib.request
 import io
 

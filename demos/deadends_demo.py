@@ -1,10 +1,10 @@
 import chunk
-from maze_structures.grid import Grid
-from maze_algorithms.binary_tree import BinaryTree
-from maze_algorithms.sidewinder import Sidewinder
-from maze_algorithms.aldous_broder import AldousBroder
-from maze_algorithms.wilson import Wilsons
-from maze_algorithms.hunt_and_kill import HuntAndKill
+from mazes.structures.grid import Grid
+from mazes.algorithms.binary_tree import BinaryTree
+from mazes.algorithms.sidewinder import Sidewinder
+from mazes.algorithms.aldous_broder import AldousBroder
+from mazes.algorithms.wilson import Wilsons
+from mazes.algorithms.hunt_and_kill import HuntAndKill
 
 algos= [BinaryTree, Sidewinder, AldousBroder, Wilsons, HuntAndKill]
 

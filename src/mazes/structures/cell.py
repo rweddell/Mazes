@@ -1,5 +1,5 @@
 from queue import PriorityQueue as pq
-from maze_structures.distances import Distances
+from mazes.structures.distances import Distances
 
 class Cell(object):
 

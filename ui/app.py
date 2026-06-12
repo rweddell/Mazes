@@ -4,23 +4,23 @@ from PIL import Image, ImageTk
 import os
 import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from maze_structures.grid import Grid
-from maze_structures.color_grid import ColoredGrid
-from maze_structures.masked_grid import MaskedGrid
-from maze_structures.polar_grid import PolarGrid
-from maze_structures.mask import from_png as mask_from_png
-from maze_structures.image_mask import (
+from mazes.structures.grid import Grid
+from mazes.structures.color_grid import ColoredGrid
+from mazes.structures.masked_grid import MaskedGrid
+from mazes.structures.polar_grid import PolarGrid
+from mazes.structures.mask import from_png as mask_from_png
+from mazes.structures.image_mask import (
     from_image_edges, from_image_shape,
     load_image_from_path, load_image_from_url
 )
-from maze_algorithms.binary_tree import BinaryTree
-from maze_algorithms.sidewinder import Sidewinder
-from maze_algorithms.aldous_broder import AldousBroder
-from maze_algorithms.wilson import Wilsons as Wilson
-from maze_algorithms.hunt_and_kill import HuntAndKill
-from maze_algorithms.recursive_backtrack import RecursiveBacktracker
+from mazes.algorithms.binary_tree import BinaryTree
+from mazes.algorithms.sidewinder import Sidewinder
+from mazes.algorithms.aldous_broder import AldousBroder
+from mazes.algorithms.wilson import Wilsons as Wilson
+from mazes.algorithms.hunt_and_kill import HuntAndKill
+from mazes.algorithms.recursive_backtrack import RecursiveBacktracker
 
 ALGORITHMS = {
     "Recursive Backtracker": RecursiveBacktracker,
@@ -154,6 +154,9 @@ class MazeApp(tk.Tk):
             grid = self._build_grid()
             algo = ALGORITHMS[self._algo_var.get()]()
             algo.on(grid)
+            # colored grids need a distance map before to_png()
+            if hasattr(grid, "set_distances"):
+                grid.set_distances(grid.random_cell().get_distances())
             cell_px = max(4, min(20, 600 // max(getattr(grid, 'rows', 20),
                                                   getattr(grid, 'columns', 20))))
             img = grid.to_png(size=cell_px)

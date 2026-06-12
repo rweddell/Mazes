@@ -1,6 +1,6 @@
 
-from maze_algorithms.recursive_backtrack import RecursiveBacktracker
-from maze_structures.grid import Grid
+from mazes.algorithms.recursive_backtrack import RecursiveBacktracker
+from mazes.structures.grid import Grid
 
 recbac = RecursiveBacktracker()
 

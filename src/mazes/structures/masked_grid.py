@@ -1,6 +1,6 @@
 from PIL import Image, ImageDraw
-from maze_structures.grid import Grid
-from maze_structures.cell import Cell
+from mazes.structures.grid import Grid
+from mazes.structures.cell import Cell
 
 
 class MaskedGrid(Grid):

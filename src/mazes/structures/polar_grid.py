@@ -1,8 +1,8 @@
 
-from maze_structures.grid import Grid
-from maze_structures.polar_cell import PolarCell
+from mazes.structures.grid import Grid
+from mazes.structures.polar_cell import PolarCell
 from PIL import Image, ImageDraw
-from math import cos, sin, pi
+from math import cos, sin, pi, degrees
 from random import randint
 from typing import cast
 
@@ -46,6 +46,10 @@ class PolarGrid(Grid):
                 for neighbor in self.grid[row+1]:
                     cell.outward.append(neighbor)
 
+    def get_size(self):
+        # rows grow outward, so the real count is the sum of each ring's length
+        return sum(len(ring) for ring in self.grid)
+
     def random_cell(self):
         row = randint(0, self.rows-1)
         col = randint(0, self.grid[row].__len__()-1)
@@ -88,10 +92,13 @@ class PolarGrid(Grid):
                     drw.ellipse([(center-size, center-size), (center+size, center+size)], fill=color)
                 else:
                     drw.polygon([(ax, ay), (bx, by), (dx, dy), (cx, cy)], fill=color)
-            if not cell.is_linked(cell.inward):
-                slope1 = ((by-ay)/(bx-ax))+90
-                slope2 = ((dy-cy)/(dx-cx))+90
-                drw.arc(xy=[(bx, by), (dx, dy)], start=slope1, end=slope2, fill=wall)
-            if not cell.is_linked(cell.cw):
+            if cell.row > 0 and not cell.is_linked(cell.inward):
+                # inner wall: arc at inner_radius spanning the cell's angular range
+                r = inner_radius
+                drw.arc([(center-r, center-r), (center+r, center+r)],
+                        start=degrees(theta_ccw), end=degrees(theta_cw),
+                        fill=wall, width=4)
+            if cell.row > 0 and not cell.is_linked(cell.cw):
+                # clockwise wall: radial line from inner to outer corner
                 drw.line([(cx, cy), (dx, dy)], fill=wall, width=4)
         return img

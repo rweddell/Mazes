@@ -1,7 +1,7 @@
 
-from maze_structures.mask import *
-from maze_structures.masked_grid import MaskedGrid
-from maze_algorithms.recursive_backtrack import RecursiveBacktracker
+from mazes.structures.mask import *
+from mazes.structures.masked_grid import MaskedGrid
+from mazes.algorithms.recursive_backtrack import RecursiveBacktracker
 from datetime import date
 
 recback = RecursiveBacktracker()

@@ -1,7 +1,7 @@
 
 from queue import PriorityQueue as pq
-from maze_structures.cell import Cell
-from maze_structures.distances import Distances
+from mazes.structures.cell import Cell
+from mazes.structures.distances import Distances
 
 
 class WeightedCell(Cell):

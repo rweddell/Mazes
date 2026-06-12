@@ -1,6 +1,6 @@
 
-from maze_structures.grid import Grid
-from maze_algorithms.binary_tree import BinaryTree
+from mazes.structures.grid import Grid
+from mazes.algorithms.binary_tree import BinaryTree
 
 larry = BinaryTree()	
 

@@ -1,5 +1,5 @@
-from maze_structures.color_grid import ColoredGrid
-from maze_structures.masked_grid import MaskedGrid
+from mazes.structures.color_grid import ColoredGrid
+from mazes.structures.masked_grid import MaskedGrid
 
 class ColoredMask(MaskedGrid, ColoredGrid):
 

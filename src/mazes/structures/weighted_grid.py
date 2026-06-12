@@ -1,6 +1,6 @@
 
-from maze_structures.distance_grid import DistanceGrid
-from maze_structures.weighted_cell import WeightedCell
+from mazes.structures.distance_grid import DistanceGrid
+from mazes.structures.weighted_cell import WeightedCell
 from random import choice
 
 

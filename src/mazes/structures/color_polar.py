@@ -1,9 +1,11 @@
-from maze_structures.grid import Grid
+from mazes.structures.polar_grid import PolarGrid
+from mazes.structures.color_grid import ColoredGrid
 
-class ColoredGrid(Grid):
 
-    def __init__(self, rows, columns):
-        super().__init__(rows, columns)
+class ColoredPolar(PolarGrid, ColoredGrid):
+
+    def __init__(self, rows):
+        PolarGrid.__init__(self, rows)
         self.farthest = None
         self.max_dist = None
         self.distlist = None
@@ -14,7 +16,7 @@ class ColoredGrid(Grid):
 
     def bg_color(self, cell):
         distance = self.distlist[cell]
-        intensity = (self.max_dist - distance)/self.max_dist
+        intensity = (self.max_dist - distance) / self.max_dist
         dark = round(255 * intensity)
         bright = 128 + round(127 * intensity)
-        return (dark, bright, dark)
+        return (bright, dark, bright)

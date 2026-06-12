@@ -1,5 +1,5 @@
-from maze_structures.weighted_grid import WeightedGrid
-from maze_algorithms.recursive_backtrack import RecursiveBacktracker as rb
+from mazes.structures.weighted_grid import WeightedGrid
+from mazes.algorithms.recursive_backtrack import RecursiveBacktracker as rb
 
 chester = rb()
 grid = chester.on(WeightedGrid(10, 10))

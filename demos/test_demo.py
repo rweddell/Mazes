@@ -1,6 +1,6 @@
 # import maze_algorithms as mz
 
-from maze_algorithms import aldous_broder
+from mazes.algorithms import aldous_broder
 
 print(dir(mz))
 

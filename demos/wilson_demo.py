@@ -1,5 +1,5 @@
-from maze_algorithms.wilson import Wilsons
-from maze_structures.grid import Grid
+from mazes.algorithms.wilson import Wilsons
+from mazes.structures.grid import Grid
 
 wilson = Wilsons()
 

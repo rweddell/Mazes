@@ -1,8 +1,8 @@
-from maze_structures.color_polar import ColoredPolar
-from maze_structures.color_grid import ColoredGrid
-from maze_algorithms.recursive_backtrack import *
-from maze_algorithms.sidewinder import Sidewinder
-from maze_structures import mask, color_mask
+from mazes.structures.color_polar import ColoredPolar
+from mazes.structures.color_grid import ColoredGrid
+from mazes.algorithms.recursive_backtrack import *
+from mazes.algorithms.sidewinder import Sidewinder
+from mazes.structures import mask, color_mask
 from datetime import date
 
 algo = RecursiveBacktracker()

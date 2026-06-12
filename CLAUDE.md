@@ -20,34 +20,28 @@ Python implementation of maze generation algorithms and visualizations from the 
 
 ## Commands
 
-**Build & install** (setup.py wipes `build/` and `dist/` on every run):
+The library lives under `src/mazes/` (src layout). Install it editable so `mazes` is importable
+everywhere (the repo uses `uv`; `uv run` auto-installs from `pyproject.toml`):
 ```bash
-python setup.py build
-python setup.py install
+uv run python main.py      # editable-installs mazes, then launches the GUI
+# or, with plain pip:  pip install -e .  &&  python main.py
 ```
 
-**Launch the GUI** (tkinter app — the main entry point):
-```bash
-python main.py
-```
+**Launch the GUI** (tkinter app — the main entry point): `python main.py`
+(`ui/app.py` also adds `src/` to `sys.path`, so the GUI runs without an install.)
 
-**Run a demo:**
-```bash
-python demos/binary_tree_demo.py   # ASCII output
-python demos/color_demo.py         # PNG output to output/
-```
+**Run a demo:** `uv run python demos/binary_tree_demo.py` (ASCII) or `demos/color_demo.py` (PNG→`output/`).
 
-**Dependencies:** `pip install Pillow` (not in setup.py). `tkinter`/`urllib` are stdlib.
-`setup.py` only packages `maze_structures` + `maze_algorithms` (not `ui`), so run the GUI from
-the project root via `python main.py`.
+**Dependencies:** Pillow (declared in `pyproject.toml`; `setup.py` is a thin shim). `tkinter`/`urllib` stdlib.
 
 There is no test suite and no linter configured. Demos serve as the primary way to validate behavior.
 
 ## Architecture
 
-The project uses a **Strategy + Inheritance** pattern split across two packages:
+The project uses a **Strategy + Inheritance** pattern split across two subpackages of `src/mazes/`
+(`structures/`, `algorithms/`), with shared helpers in `mazes/utils/` (e.g. `base36`):
 
-### `maze_algorithms/` — Generation Algorithms
+### `mazes/algorithms/` — Generation Algorithms
 
 All algorithms inherit from `MazeAlgorithm` (abstract base in `maze_algorithm.py`) and implement a single method:
 
@@ -57,7 +51,7 @@ def on(self, grid):  # carves passages by calling cell.link()
 
 Algorithms: `BinaryTree`, `Sidewinder`, `AldousBroder`, `Wilson`, `HuntAndKill`, `RecursiveBacktracker`.
 
-### `maze_structures/` — Grid and Cell Types
+### `mazes/structures/` — Grid and Cell Types
 
 **Cell hierarchy:**
 - `Cell` — base; holds N/S/E/W neighbor references and a `linked` set for carved passages
@@ -73,27 +67,18 @@ Algorithms: `BinaryTree`, `Sidewinder`, `AldousBroder`, `Wilson`, `HuntAndKill`,
 - `ColoredPolar` — multiple-inherits `PolarGrid` + `ColoredGrid` for colorized circular mazes
 - `WeightedGrid` — pairs with `WeightedCell` for Dijkstra/weighted pathfinding
 
-**Distance tracking (`distances.py`, `distance_grid.py`):**  
-`Distances` runs BFS (or priority queue for weighted) from a root cell and stores distances. Used for path-finding (`path_to()`) and coloring (`ColoredGrid`).
+**Distance tracking (`distances.py`, `distance_grid.py`):** `Distances` runs BFS (priority queue for
+weighted) from a root cell, storing distances for path-finding (`path_to()`) and coloring (`ColoredGrid`).
 
 ### `ui/` — Tkinter GUI (`ui/app.py`)
 
-`MazeApp(tk.Tk)` is a two-panel window: left = controls, right = preview canvas.
-It maps user choices to the packages above via two dicts (`ALGORITHMS`, `GRID_TYPES`):
-- `_build_grid()` decides the grid type — `PolarGrid` (ignores columns + image), else
-  `MaskedGrid` from `image_mask.from_image_edges`/`from_image_shape` when an image is supplied,
-  else `ColoredGrid`. Image sources come from a file browse or a URL.
-- `_generate()` runs the selected algorithm's `.on(grid)`, calls `grid.to_png(size=...)`, and
-  renders the result. Errors surface in a `messagebox` and the status label (graceful handling).
+`MazeApp(tk.Tk)` is a two-panel window (controls left, preview right) mapping choices via `ALGORITHMS`
+/`GRID_TYPES` dicts. `_build_grid()` picks the grid (`PolarGrid`, else `MaskedGrid` from an image, else
+`ColoredGrid`); `_generate()` runs `.on(grid)`, calls `grid.to_png(size=...)`, and renders — errors surface
+in a `messagebox` + status label.
 
-### Typical usage pattern (from demos):
-
-```python
-grid = ColoredGrid(10, 10)
-RecursiveBacktracker().on(grid)
-grid.distances = Distances(grid[0, 0]).path_to(grid[grid.rows-1, grid.columns-1])
-grid.to_png("output/maze.png")
-```
+Typical usage (see demos): build a grid, run `Algorithm().on(grid)`, optionally set
+`grid.distances` via `Distances(root).path_to(target)`, then `grid.to_png("output/maze.png")`.
 
 ### Key design details
 
@@ -104,8 +89,11 @@ grid.to_png("output/maze.png")
 - `PolarGrid` dynamically computes row widths based on circumference; algorithms must handle variable neighbor counts.
 - `wilson.py` defines the class as `Wilsons` (not `Wilson`) — import accordingly.
 
-## Session summary (2026-04-19 → 2026-06-04)
+## Session summary (2026-06-05)
 
-**Bug fixes:** `Grid.__getitem__` debug prints removed; `Grid.to_png` swapped PIL dims; `Mask.__init__` off-by-one; `Mask.random_location` IndexError; `from_txt` double open; `PolarGrid` duplicate `cell.cw`; `PolarGrid.to_png` `cellsize`→`size`; `wilson.py` import; Pyright `cast(PolarCell, ...)` in `polar_grid.py`.
-
-**Features:** `image_mask.py` (edge/shape masks from PIL images or URLs); `ui/app.py` tkinter GUI (algorithm + grid-type pickers, size, image upload/URL, preview, save); `main.py` launches the GUI. Documented GUI + build/install/launch commands in this file.
+**src-layout refactor:** packages moved under `src/mazes/` (`maze_structures`→`mazes.structures`,
+`maze_algorithms`→`mazes.algorithms`, `base36.py`→`mazes/utils/base36.py`); all imports rewritten across
+packages, 15 demos, and `ui/app.py` (`sys.path` shim now points at `src/`). `pyproject.toml` is the single
+build config (setuptools, `packages.find where=["src"]`); `setup.py` is a shim. Verified via `uv run`: build,
+import smoke test, demo render, `ui.app` import. Root monoliths `big_grid.py`/`new_maze_algorithm.py` kept
+(dead duplicates, per user). Prior sessions: many bug fixes + `image_mask.py` and the `ui/app.py` GUI.

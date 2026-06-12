@@ -1,6 +1,6 @@
 
 from random import choice
-from maze_algorithms.maze_algorithm import MazeAlgorithm
+from mazes.algorithms.maze_algorithm import MazeAlgorithm
 
 class RecursiveBacktracker(MazeAlgorithm):
 
